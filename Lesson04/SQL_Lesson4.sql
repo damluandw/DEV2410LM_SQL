@@ -249,9 +249,9 @@ SELECT MaSV, HoSV, TenSV, Phai, NgaySinh, NoiSinh, MaKH, HocBong, DiemTrungBinh
 --7. Danh sách những sinh viên có điểm thi mônĐồ hoạ nhỏ hơn điểm thi môn Đồ  hoạ nhỏ nhất của sinh viên khoa Tin học  
 --8. Liệt kê những sinh viên sinh sau sinh viên có tuổi nhỏ nhất trong khoa Anh văn  
 --9. Cho biết những sinh viên có học bổng lớn hơn tổng học bổng của những sinh  viên thuộc khoa Kế toán
- -- tìm sinh viên khoa triết
+ -- tìm sinh viên khoa Kế toán
  SELECT * FROM [dbo].[SinhVien] WHERE MaKH  in (select MaKH from [dbo].[Khoa] where TenKH =N'Kế toán')
- -- tính tổng học bổng của sinh viên khoa triết
+ -- tính tổng học bổng của sinh viên khoa Kế toán
  SELECT SUM(HocBong) FROM [dbo].[SinhVien] WHERE MaKH  in (select MaKH from [dbo].[Khoa] where TenKH =N'Kế toán')
 --  tìm sinh viên có học bổng > ...
  SELECT * FROM [dbo].[SinhVien] WHERE HocBong > (SELECT SUM(HocBong) FROM [dbo].[SinhVien] WHERE MaKH  in (select MaKH from [dbo].[Khoa] where TenKH =N'Kế toán'))
@@ -286,7 +286,7 @@ SELECT MaSV, HoSV, TenSV, Phai, NgaySinh, NoiSinh, MaKH, HocBong, DiemTrungBinh
 	FROM SinhVien WHERE NoiSinh  = @NoiSinh
 --11. Danh sách sinh viên có điểm cao nhất ứng với mỗi môn, gồm thông tin: Mã sinh  viên, Họ tên sinh viên, Tên môn, Điểm
 -- danh sách điểm cao nhất mới mỗi môn học
-SELECT MH.MaMH, MH.TenMH, MAX(Diem) AS DiemMax --INTO #TMP1
+SELECT MH.MaMH, MH.TenMH, MAX(Diem) AS DiemMax INTO #TMP1
  FROM [dbo].[MonHoc] MH 
 	INNER JOIN Ketqua KQ ON MH.MaMH = KQ.MaMH
 	GROUP BY MH.MaMH, MH.TenMH
@@ -296,7 +296,6 @@ SELECT MH.MaMH, MH.TenMH, MAX(Diem) AS DiemMax --INTO #TMP1
 --	INNER JOIN Ketqua KQ ON MH.MaMH = KQ.MaMH
 --	GROUP BY MH.MaMH
 SELECT * FROM #TMP1
-DROP TABLE #TMP1
 -- 
 SELECT SV.MaSV, CONCAT(HoSV,' ', TenSV) as HoTen, TMP.TenMH, Diem FROM [dbo].[SinhVien] SV
 INNER JOIN Ketqua KQ ON SV.MaSV =  KQ.MaSV
@@ -306,6 +305,8 @@ INNER JOIN (SELECT MH.MaMH, MH.TenMH, MAX(Diem) AS DiemMax
 				INNER JOIN Ketqua KQ ON MH.MaMH = KQ.MaMH
 				GROUP BY MH.MaMH, MH.TenMH) TMP ON KQ.MaMH =TMP.MaMH AND TMP.DiemMax = KQ.Diem
 				ORDER BY TMP.TenMH
+
+DROP TABLE #TMP1
 -- CÁCH 2
 
 SELECT SV.MaSV, CONCAT(HoSV,' ', TenSV) as HoTen, TMP.TenMH, Diem FROM [dbo].[SinhVien] SV
